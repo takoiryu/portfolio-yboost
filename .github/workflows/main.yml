@@ -21,7 +21,7 @@ jobs:
         run: |
           touch config.js
           cat <<EDF > config.js
-          API_Config = {
+          window.API = {
               SUPABASE_URL : '${{secrets.SUPABASE_URL}}',
               SUPABASE_ANON_KEY : '${{secrets.SUPABASE_ANON_KEY}}'
           };
