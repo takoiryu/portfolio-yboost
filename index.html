@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blender Portfolio 3D</title>
+    
+    <!-- Bootstrap 5 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #1d1d1d;
+            --panel-bg: #2b2b2b;
+            --header-bg: #343434;
+            --border-color: #181818;
+            --orange: #e57922;
+            --text-main: #cfcfcf;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 11px;
+            user-select: none;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* En-tête supérieur */
+        .topbar {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            height: 28px;
+            padding: 0 6px;
+        }
+
+        .menu-item {
+            color: var(--text-main);
+            padding: 2px 8px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .menu-item:hover { background-color: #474747; }
+        .menu-item.active { background-color: #555; font-weight: 600; }
+
+        /* Sous-barre mode */
+        .subbar {
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            height: 26px;
+            padding: 0 8px;
+        }
+
+        /* Barre d'outils gauche */
+        .toolbar {
+            width: 32px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 6px;
+            gap: 4px;
+        }
+
+        .tool-btn {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        .tool-btn:hover { background-color: #3e3e3e; }
+        .tool-btn.active { background-color: var(--orange); color: #fff; }
+
+        /* Zone centrale Viewport 3D */
+        .viewport-area {
+            position: relative;
+            background: radial-gradient(circle at center, #3c3c3c 0%, #282828 70%, #1e1e1e 100%);
+            flex-grow: 1;
+        }
+
+        .viewport-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #aaa;
+            font-family: monospace;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .axis-gizmo {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Panneau latéral droit */
+        .sidebar {
+            width: 300px;
+            background-color: var(--panel-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            background-color: var(--header-bg);
+            padding: 4px 8px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .outliner-tree {
+            height: 180px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .item {
+            padding: 3px 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+        .item:hover { background-color: #383838; }
+        .item.active { background-color: #444; color: var(--orange) !important; font-weight: bold; }
+
+        .properties-body {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .prop-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            gap: 6px;
+        }
+
+        .prop-input {
+            background-color: #181818;
+            border: 1px solid #333;
+            color: var(--orange);
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-family: monospace;
+            flex-grow: 1;
+        }
+
+        /* Timeline bas */
+        .timeline {
+            height: 32px;
+            background-color: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column">
+
+    <!-- Topbar -->
+    <div class="topbar d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-1">
+            <i class="bi bi-box-seam text-warning px-1"></i>
+            <span class="menu-item">File</span>
+            <span class="menu-item">Edit</span>
+            <span class="menu-item">Render</span>
+            <span class="menu-item active ms-2">Layout</span>
+        </div>
+        <div class="text-secondary small d-none d-md-block">Blender 3D Portfolio</div>
+    </div>
+
+    <!-- Subbar -->
+    <div class="subbar d-flex align-items-center gap-2">
+        <div class="btn btn-sm btn-dark py-0 px-2 border-secondary" style="font-size: 10px;">
+            <i class="bi bi-cube"></i> Object Mode <i class="bi bi-caret-down-fill ms-1"></i>
+        </div>
+        <span class="text-secondary">View</span>
+        <span class="text-secondary">Select</span>
+        <span class="text-secondary">Add</span>
+    </div>
+
+    <!-- Workspace -->
+    <div class="d-flex flex-grow-1 overflow-hidden">
+        
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="tool-btn active"><i class="bi bi-cursor"></i></div>
+            <div class="tool-btn"><i class="bi bi-crosshair"></i></div>
+            <div class="tool-btn"><i class="bi bi-arrows-move"></i></div>
+            <div class="tool-btn"><i class="bi bi-arrow-repeat"></i></div>
+        </div>
+
+        <!-- Viewport 3D -->
+        <div class="viewport-area p-0 d-flex flex-column flex-grow-1" id="viewport">
+            <div class="viewport-info">User Perspective<br>(1) Collection | Project 3D</div>
+
+            <div class="axis-gizmo">
+                <svg width="50" height="50" viewBox="0 0 100 100">
+                    <line x1="50" y1="50" x2="85" y2="50" stroke="#ff3b30" stroke-width="4" />
+                    <text x="90" y="54" fill="#ff3b30" font-weight="bold" font-size="14">X</text>
+                    <line x1="50" y1="50" x2="50" y2="15" stroke="#34c759" stroke-width="4" />
+                    <text x="46" y="10" fill="#34c759" font-weight="bold" font-size="14">Y</text>
+                    <line x1="50" y1="50" x2="25" y2="75" stroke="#007aff" stroke-width="4" />
+                    <text x="12" y="85" fill="#007aff" font-weight="bold" font-size="14">Z</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Sidebar droite -->
+        <div class="sidebar d-none d-lg-flex">
+            
+            <div class="panel-title">
+                <span><i class="bi bi-diagram-3 me-1"></i> Scene Collection</span>
+            </div>
+            
+            <!-- Liste dynamique des projets -->
+            <div class="outliner-tree" id="outliner">
+                <div class="item"><i class="bi bi-folder2-open text-warning"></i> Collection</div>
+                <div class="item ms-3 text-secondary">Chargement...</div>
+            </div>
+
+            <div class="panel-title">
+                <span><i class="bi bi-sliders me-1"></i> Object Properties</span>
+            </div>
+            
+            <div class="properties-body">
+                <div class="fw-bold mb-2 text-warning"><i class="bi bi-person-badge me-1"></i> Profil François-Joseph</div>
+                <p class="text-secondary big mb-3 fs-6">Étudiant Bachelor Informatique à Ynov Sophia, je m’intéresse audéveloppement et à la cybersécurité . Je cherche une alternance/stage en informatique pour la rentrée 2027.</p>
+
+                <div class="fw-bold mb-2 text-warning"><i class="bi bi-code-slash me-1"></i> Compétences</div>
+                <div id="competences-container">
+                    <div class="text-secondary">Chargement des compétences...</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline justify-content-between text-secondary">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-play-fill text-light"></i>
+            <span class="text-light ms-2">Frame: 1 / 250</span>
+        </div>
+        <span class="badge bg-secondary">60.0 fps</span>
+    </div>
+
+    <!-- Modal Popup Bootstrap -->
+    <div class="modal fade" id="modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title text-warning" id="modal-title"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modal-desc" class="text-secondary mb-3 fs-6"></p>
+                    <div id="modal-img"></div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <a id="modal-link" href="#" target="_blank" class="btn btn-sm btn-outline-warning">Ouvrir le lien</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/FontLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/geometries/TextGeometry.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
