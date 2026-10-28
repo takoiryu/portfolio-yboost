@@ -1,5 +1,5 @@
 // Config Supabase
-const supabaseClient = supabase.createClient(API.SUPABASE_URL, API.SUPABASE_ANON_KEY);
+const supabaseClient = supabase.createClient(window.API.SUPABASE_URL, window.API.SUPABASE_ANON_KEY);
 
 
 let scene, camera, renderer, raycaster, mouse;
